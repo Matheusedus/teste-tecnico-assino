@@ -22,8 +22,38 @@ public class TasksController : ControllerBase
     /// Create a new task
     /// </summary>
     [HttpPost]
-    public async Task<IActionResult> Create([FromBody] CreateTaskCommand command)
+    [Consumes("multipart/form-data")]
+    public async Task<IActionResult> Create(
+    [FromForm] string title,
+    [FromForm] int slaInHours,
+    [FromForm] IFormFile? file)
     {
+        string? fileName = null;
+
+        if (file is not null)
+        {
+            var uploadsPath = Path.Combine(
+                Directory.GetCurrentDirectory(),
+                "Uploads"
+            );
+
+            if (!Directory.Exists(uploadsPath))
+                Directory.CreateDirectory(uploadsPath);
+
+            fileName = $"{Guid.NewGuid()}_{file.FileName}";
+            var filePath = Path.Combine(uploadsPath, fileName);
+
+            using var stream = new FileStream(filePath, FileMode.Create);
+            await file.CopyToAsync(stream);
+        }
+
+        var command = new CreateTaskCommand
+        {
+            Title = title,
+            SlaInHours = slaInHours,
+            FileName = fileName
+        };
+
         var handler = new CreateTaskHandler(_repository);
         var taskId = await handler.HandleAsync(command);
 
@@ -34,10 +64,12 @@ public class TasksController : ControllerBase
     /// List tasks
     /// </summary>
     [HttpGet]
-    public async Task<IActionResult> GetAll([FromQuery] bool completed = false)
+    public async Task<IActionResult> GetAll(
+    [FromQuery] bool completed = false,
+    [FromQuery] bool expired = false)
     {
         var handler = new ListTasksHandler(_repository);
-        var tasks = await handler.HandleAsync(completed);
+        var tasks = await handler.HandleAsync(completed, expired);
 
         return Ok(tasks);
     }
