@@ -5,7 +5,7 @@ namespace TaskManager.Domain.Entities;
 public class Task
 {
     public Guid Id { get; private set; }
-    public string Title { get; private set; }
+    public string Title { get; private set; } = null!;
     public TaskState Status { get; private set; }
     public int SlaInHours { get; private set; }
     public DateTime CreatedAt { get; private set; }
