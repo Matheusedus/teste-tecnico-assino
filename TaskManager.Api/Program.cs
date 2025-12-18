@@ -11,6 +11,17 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddHostedService<TaskSlaChecker>();
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(policy =>
+    {
+        policy
+            .AllowAnyOrigin()
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseInMemoryDatabase("TasksDb"));
@@ -22,6 +33,7 @@ var app = builder.Build();
 // Configure pipeline
 app.UseSwagger();
 app.UseSwaggerUI();
+app.UseCors();
 
 app.UseAuthorization();
 app.MapControllers();
