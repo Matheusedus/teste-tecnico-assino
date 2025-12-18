@@ -57,7 +57,7 @@ public class TasksController : ControllerBase
         var handler = new CreateTaskHandler(_repository);
         var taskId = await handler.HandleAsync(command);
 
-        return CreatedAtAction(nameof(GetAll), new { id = taskId }, new { id = taskId });
+        return Ok(new { id = taskId });
     }
 
     /// <summary>
