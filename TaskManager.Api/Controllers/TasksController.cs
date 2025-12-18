@@ -2,6 +2,8 @@ using Microsoft.AspNetCore.Mvc;
 using TaskManager.Application.Interfaces;
 using TaskManager.Application.UseCases.CreateTask;
 using TaskManager.Application.UseCases.ListTasks;
+using TaskManager.Application.UseCases.CompleteTask;
+
 
 namespace TaskManager.Api.Controllers;
 
@@ -38,5 +40,17 @@ public class TasksController : ControllerBase
         var tasks = await handler.HandleAsync(completed);
 
         return Ok(tasks);
+    }
+
+    /// <summary>
+    /// Complete a task
+    /// </summary>
+    [HttpPut("{id}/complete")]
+    public async Task<IActionResult> Complete(Guid id)
+    {
+        var handler = new CompleteTaskHandler(_repository);
+        await handler.HandleAsync(id);
+
+        return NoContent();
     }
 }
